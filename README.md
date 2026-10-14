@@ -76,8 +76,8 @@ bad data.
 
 ## Build and run
 
-Requires a C++17 compiler and `make`. Tested on macOS (Apple clang 17); CI also builds on
-Linux.
+Requires a C++17 compiler and `make`. Built and tested on macOS (Apple clang) and Linux
+(GCC).
 
 ```sh
 make            # library, kvcli, kvbench, kv_tests   (output in build/)
@@ -113,9 +113,9 @@ the public API is [include/kv/db.h](include/kv/db.h) and
   vector and a bitwise reference, WAL, SSTable (iteration, seek, corruption detection),
   merge iterator.
 
-The suite passes natively and under UBSan. ThreadSanitizer and AddressSanitizer jobs run in
-CI; their runtimes do not start on the development machine used for this project, so those
-two were not run locally.
+CI runs the full suite on Linux (release, ThreadSanitizer, AddressSanitizer, UBSan) and on
+macOS, and all five jobs pass. The sanitizer runtimes don't start on the development
+machine this was written on, so TSan and ASan results come from CI only.
 
 ## Benchmarks
 

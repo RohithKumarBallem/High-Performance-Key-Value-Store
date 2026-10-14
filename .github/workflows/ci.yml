@@ -23,7 +23,21 @@ jobs:
           - os: macos-latest
     steps:
       - uses: actions/checkout@v4
+
+      # Failures are re-emitted as ::error:: annotations so the cause shows up
+      # on the run summary without opening the raw log.
       - name: Build
-        run: make -j4 SAN=${{ matrix.sanitizer }}
+        run: |
+          set -o pipefail
+          make -j4 SAN=${{ matrix.sanitizer }} 2>&1 | tee build.log || {
+            grep -E "error|undefined reference|ld:" build.log | head -20 | sed 's/^/::error::/'
+            exit 1
+          }
+
       - name: Test
-        run: make test SAN=${{ matrix.sanitizer }}
+        run: |
+          set -o pipefail
+          make test SAN=${{ matrix.sanitizer }} 2>&1 | tee test.log || {
+            grep -E "FAIL|WARNING: ThreadSanitizer|ERROR: AddressSanitizer|runtime error|SUMMARY|CHECK" test.log | head -20 | sed 's/^/::error::/'
+            exit 1
+          }

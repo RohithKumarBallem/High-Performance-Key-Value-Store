@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    name: ${{ matrix.os }} / ${{ matrix.sanitizer || 'release' }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+          - os: ubuntu-latest
+            sanitizer: thread
+          - os: ubuntu-latest
+            sanitizer: address
+          - os: ubuntu-latest
+            sanitizer: undefined
+          - os: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: make -j4 SAN=${{ matrix.sanitizer }}
+      - name: Test
+        run: make test SAN=${{ matrix.sanitizer }}
